@@ -294,7 +294,7 @@ removed on the respective remote."
                     (propertize " from"      'face 'magit-popup-heading))
                  (propertize "Pull from" 'face 'magit-popup-heading)))
              (?p magit-get-push-branch     magit-pull-from-pushremote)
-             (?u magit-get-upstream-branch magit-pull-from-upstream)
+             (?F magit-get-upstream-branch magit-pull-from-upstream)
              (?e "elsewhere"               magit-pull))
   :default-action 'magit-pull
   :max-action-columns 1)
@@ -439,7 +439,7 @@ removed after restarting Emacs."
                          (propertize " to"   'face 'magit-popup-heading))))
              (?p magit--push-current-to-pushremote-desc
                  magit-push-current-to-pushremote)
-             (?u magit--push-current-to-upstream-desc
+             (?P magit--push-current-to-upstream-desc
                  magit-push-current-to-upstream)
              (?e "elsewhere\n"       magit-push-current)
              "Push"
