@@ -722,16 +722,41 @@ are considered."
 
 ;;; Revisions and References
 
+(defvar magit--rev-parse-toplevel-cache (make-hash-table :test #'equal))
+(defvar magit--rev-parse-cdup-cache (make-hash-table :test #'equal))
+(defvar magit--rev-parse-git-dir-cache (make-hash-table :test #'equal))
+
+(defmacro magit--use-rev-parse-cache (cmd args)
+  `(pcase ,args
+     ('("--show-toplevel")
+      (or (gethash default-directory magit--rev-parse-toplevel-cache)
+          (let ((dir ,cmd))
+            (puthash default-directory dir magit--rev-parse-toplevel-cache)
+            dir)))
+     ('("--show-cdup")
+      (or (gethash default-directory magit--rev-parse-cdup-cache)
+          (let ((dir ,cmd))
+            (puthash default-directory dir magit--rev-parse-cdup-cache)
+            dir)))
+     ('("--git-dir")
+      (or (gethash default-directory magit--rev-parse-git-dir-cache)
+          (let ((dir ,cmd))
+            (puthash default-directory dir magit--rev-parse-git-dir-cache)
+            dir)))
+     (_ ,cmd)))
+
 (defun magit-rev-parse (&rest args)
   "Execute `git rev-parse ARGS', returning first line of output.
 If there is no output return nil."
-  (apply #'magit-git-string "rev-parse" args))
+  (magit--use-rev-parse-cache
+   (apply #'magit-git-string "rev-parse" args) args))
 
 (defun magit-rev-parse-safe (&rest args)
   "Execute `git rev-parse ARGS', returning first line of output.
 If there is no output return nil.  Like `magit-rev-parse' but
 ignore `magit-git-debug'."
-  (apply #'magit-git-str "rev-parse" args))
+  (magit--use-rev-parse-cache
+   (apply #'magit-git-str "rev-parse" args) args))
 
 (defun magit-rev-parse-p (&rest args)
   "Execute `git rev-parse ARGS', returning t if it prints \"true\".
